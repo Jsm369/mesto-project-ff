@@ -5,25 +5,21 @@ const cardContainer = container.querySelector('.places__list')
 
 const addCard = (titleValue, imageValue, onClick) => {
   const cardElement = cardTemplate.querySelector('.card').cloneNode(true)
+  const deleteButton = cardElement.querySelector('.card__delete-button')
 
   cardElement.querySelector('.card__title').textContent = titleValue
   cardElement.querySelector('.card__image').src = imageValue
+  cardElement.querySelector('.card__image').setAttribute('alt', `${titleValue}`)
 
-  cardContainer.append(cardElement)
+  deleteButton.addEventListener('click', () => onClick(cardElement))
 
-  const deleteButton = cardElement.querySelector('.card__delete-button')
-
-  deleteButton.addEventListener('click', () => {
-    onClick()
-  })
+  return cardElement
 }
 
-const deleteCard = () => {
-  const cardDelete = document.querySelector('.card')
-
-  cardDelete.remove()
+const deleteCard = (card) => {
+  card.remove()
 }
 
 initialCards.forEach((item) => {
-  addCard(item.name, item.link, deleteCard)
+  cardContainer.append(addCard(item.name, item.link, deleteCard))
 })
