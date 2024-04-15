@@ -24,6 +24,6 @@ const deleteCard = () => {
   cardDelete.remove()
 }
 
-initialCards.map((item) => {
+initialCards.forEach((item) => {
   addCard(item.name, item.link, deleteCard)
 })
