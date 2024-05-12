@@ -48,7 +48,7 @@ editForm.addEventListener('submit', (e) => {
   e.preventDefault();
 
   profileTitle.textContent = editFormName.value;
-  profileDescription.textContent = editFormDescription;
+  profileDescription.textContent = editFormDescription.value;
 
   closeEditModal();
 
