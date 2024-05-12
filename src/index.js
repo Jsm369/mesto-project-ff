@@ -1,5 +1,5 @@
 import '../pages/index.css'
-import './cards.js'
+import { initialCards } from './cards'
 
 const cardTemplate = document.querySelector('#card-template').content
 
@@ -15,10 +15,6 @@ const addCard = (titleValue, imageValue, onClick) => {
   cardElement.querySelector('.card__image').setAttribute('alt', `${titleValue}`)
 
   deleteButton.addEventListener('click', () => onClick(cardElement))
-}
-
-const createCard = (item, handleDelete) => {
-  addCard(item.name, item.link, handleDelete)
 
   return cardElement
 }
@@ -28,5 +24,5 @@ const deleteCard = (card) => {
 }
 
 initialCards.forEach((item) => {
-  cardContainer.append(createCard(item, deleteCard))
+  cardContainer.append(addCard(item.name, item.link, deleteCard))
 })

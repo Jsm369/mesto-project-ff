@@ -4,20 +4,18 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 
 module.exports = {
-  entry: {
-    main: './src/index.js'
-  },
+  entry: ['./src/index.js', './src/cards.js'],
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: 'main.js',
-    publicPath: ''
+    publicPath: '/'
   },
   mode: 'development',
   devServer: {
     static: path.resolve(__dirname, './dist'),
     open: true,
     compress: true,
-    port: 8080
+    port: 4400
   },
   module: {
     rules: [
@@ -52,7 +50,7 @@ module.exports = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: './index.html'
+      template: './src/index.html'
     }),
     new CleanWebpackPlugin(),
     new MiniCssExtractPlugin()
