@@ -4,7 +4,7 @@ import {
   updateProfile,
   addCard,
   getProfileData,
-  editAvatar,
+  updateAvatar,
   getCards
 } from './api/api';
 import { initModal } from './components/modal';
@@ -73,15 +73,19 @@ avatarForm.addEventListener('submit', (e) => {
     avatar: inputAvatarFormImage.value
   };
 
-  editAvatar(profileDataImage) // updateAvatar
-    .then(() => {
+  saveButton.textContent = 'Сохранение...';
+
+  updateAvatar(profileDataImage)
+    .then((res) => {
       avatarForm.reset();
-      saveButton.textContent = 'Сохранение...';
-      profileImage.style.backgroundImage = `url(${profileDataImage.avatar})`;
+      profileImage.style.backgroundImage = `url(${res.avatar})`;
       closeChangeModal();
     })
     .catch((err) => {
       console.error('Ошибка при изменении аватара:', err);
+    })
+    .finally(() => {
+      saveButton.textContent = '';
     });
 });
 
@@ -94,15 +98,18 @@ editForm.addEventListener('submit', (e) => {
     name: editFormInputName.value,
     about: editFormInputDescription.value
   };
+  saveButton.textContent = 'Сохранение...';
 
   updateProfile(userData)
     .then(() => {
-      saveButton.textContent = 'Сохранение...';
       profileTitle.textContent = userData.name;
       profileDescription.textContent = userData.about;
     })
     .catch((err) => {
       console.log(err);
+    })
+    .finally(() => {
+      saveButton.textContent = '';
     });
 
   closeEditModal();
@@ -118,10 +125,10 @@ addCardForm.addEventListener('submit', (e) => {
     link: addCardFormInputLink.value
   };
 
+  saveButton.textContent = 'Сохранение...';
+
   addCard(cardData)
     .then((res) => {
-      saveButton.textContent = 'Сохранение...';
-
       renderCard(
         res,
         cardContainer,
@@ -136,6 +143,9 @@ addCardForm.addEventListener('submit', (e) => {
     })
     .catch((err) => {
       console.error(err);
+    })
+    .finally(() => {
+      saveButton.textContent = '';
     });
 });
 
