@@ -67,6 +67,8 @@ const { closeModal: closeChangeModal } = initModal({
 avatarForm.addEventListener('submit', (e) => {
   e.preventDefault();
 
+  const saveButton = avatarForm.querySelector('.popup__button');
+
   const profileDataImage = {
     avatar: inputAvatarFormImage.value
   };
@@ -74,6 +76,7 @@ avatarForm.addEventListener('submit', (e) => {
   editAvatar(profileDataImage) // updateAvatar
     .then(() => {
       avatarForm.reset();
+      saveButton.textContent = 'Сохранение...';
       profileImage.style.backgroundImage = `url(${profileDataImage.avatar})`;
       closeChangeModal();
     })
@@ -85,6 +88,8 @@ avatarForm.addEventListener('submit', (e) => {
 editForm.addEventListener('submit', (e) => {
   e.preventDefault();
 
+  const saveButton = editForm.querySelector('.popup__button');
+
   const userData = {
     name: editFormInputName.value,
     about: editFormInputDescription.value
@@ -92,6 +97,7 @@ editForm.addEventListener('submit', (e) => {
 
   updateProfile(userData)
     .then(() => {
+      saveButton.textContent = 'Сохранение...';
       profileTitle.textContent = userData.name;
       profileDescription.textContent = userData.about;
     })
@@ -105,6 +111,8 @@ editForm.addEventListener('submit', (e) => {
 addCardForm.addEventListener('submit', (e) => {
   e.preventDefault();
 
+  const saveButton = addCardForm.querySelector('.popup__button');
+
   const cardData = {
     name: addCardFormInputName.value,
     link: addCardFormInputLink.value
@@ -112,6 +120,8 @@ addCardForm.addEventListener('submit', (e) => {
 
   addCard(cardData)
     .then((res) => {
+      saveButton.textContent = 'Сохранение...';
+
       renderCard(
         res,
         cardContainer,
