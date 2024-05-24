@@ -1,9 +1,18 @@
+import { clearValidation, setEventListener } from './validation';
+
 const openModal = (modal) => {
   modal.classList.add('popup_is-opened');
+
+  setEventListener(modal);
 };
 
 const closeModal = (modal) => {
   modal.classList.remove('popup_is-opened');
+  const formElement = modal.querySelector('.popup__form');
+
+  if (formElement) {
+    clearValidation(formElement);
+  }
 };
 
 export const initModal = ({ modal, openTarget, onOpen }) => {

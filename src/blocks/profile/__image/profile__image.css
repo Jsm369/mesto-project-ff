@@ -7,7 +7,47 @@
   background-size: cover;
   background-position: center;
   margin: 0 29px 0 0;
-  background-image: url('../../../images/avatar.jpg');
+  /* background-image: url('../../../images/avatar.jpg'); */
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+
+  &:hover::before,
+  &:hover::after {
+    opacity: 1;
+  }
+
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  &::before {
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 50%;
+    opacity: 0;
+  }
+
+  &::after {
+    content: '';
+    background-size: contain;
+    background-repeat: no-repeat;
+    width: 26px;
+    height: 26px;
+    background-image: url('../../../images/edit-icon.svg');
+    background-size: contain;
+    background-repeat: no-repeat;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0;
+  }
 }
 
 @media screen and (max-width: 740px) {

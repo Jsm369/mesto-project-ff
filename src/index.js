@@ -1,71 +1,103 @@
 import './pages/index.css';
-import { createCard, deleteCard, likeCard } from './components/cards';
-
-import { initialCards } from './components/initialCards';
+import { renderCards, renderCard } from './components/cards';
+import {
+  updateProfile,
+  addCard,
+  getProfileData,
+  editAvatar,
+  getCards
+} from './api/api';
 import { initModal } from './components/modal';
 
 const container = document.querySelector('.page');
 const cardContainer = container.querySelector('.places__list');
 const addButton = document.querySelector('.profile__add-button');
 const editButton = document.querySelector('.profile__edit-button');
-
+const changeAvatarButton = document.querySelector('.profile__image');
 // popups
 const newCardPopup = document.querySelector('.popup_type_new-card');
 const editProfilePopup = document.querySelector('.popup_type_edit');
 const selectImagePopup = document.querySelector('.popup_type_image');
-
+const avatarPopup = document.querySelector('.popup_type_change-avatar');
 // profile
 const profileTitle = document.querySelector('.profile__title');
+const profileImage = document.querySelector('.profile__image');
 const profileDescription = document.querySelector('.profile__description');
 // forms
 const editForm = document.forms.edit_profile;
 const addCardForm = document.forms.new_place;
+const avatarForm = document.forms.change_avatar;
 //form inputs
-const editFormName = editForm.elements.name;
-const editFormDescription = editForm.elements.description;
-const addCardFormName = addCardForm.elements.place_name;
-const addCardFormLink = addCardForm.elements.link;
-
-const setSelectImage = (item) => {
-  const caption = selectImagePopup.querySelector('.popup__caption');
-  const image = selectImagePopup.querySelector('.popup__image');
-
-  caption.textContent = item.name;
-  image.alt = item.name;
-  image.src = item.link;
-};
+const editFormInputName = editForm.elements.name;
+const editFormInputDescription = editForm.elements.description;
+const addCardFormInputName = addCardForm.elements.place_name;
+const addCardFormInputLink = addCardForm.elements.link;
+const inputAvatarFormImage = avatarForm.elements.image;
 
 // Init Modals
 const { closeModal: closeEditModal } = initModal({
   modal: editProfilePopup,
   openTarget: editButton,
   onOpen: () => {
-    const popupEditNameValue = editProfilePopup.querySelector(
-      '.popup__input_type_name'
-    );
-    const popupEditDescriptionValue = editProfilePopup.querySelector(
-      '.popup__input_type_description'
-    );
-    popupEditNameValue.value = profileTitle.textContent;
-    popupEditDescriptionValue.value = profileDescription.textContent;
+    editFormInputName.value = profileTitle.textContent;
+    editFormInputDescription.value = profileDescription.textContent;
   }
 });
 
 const { closeModal: closeAddModal } = initModal({
   modal: newCardPopup,
-  openTarget: addButton
+  openTarget: addButton,
+  onOpen: () => {
+    (addCardFormInputName.value = ''), (addCardFormInputLink.value = '');
+  }
 });
 
 const { openModal: openSelectImagePopup } = initModal({
   modal: selectImagePopup
 });
 
-// Submit
+const { closeModal: closeChangeModal } = initModal({
+  modal: avatarPopup,
+  openTarget: changeAvatarButton,
+  onOpen: () => {
+    inputAvatarFormImage.value = '';
+  }
+});
+
+avatarForm.addEventListener('submit', (e) => {
+  e.preventDefault();
+
+  const profileDataImage = {
+    avatar: inputAvatarFormImage.value
+  };
+
+  editAvatar(profileDataImage) // updateAvatar
+    .then(() => {
+      avatarForm.reset();
+      profileImage.style.backgroundImage = `url(${profileDataImage.avatar})`;
+      closeChangeModal();
+    })
+    .catch((err) => {
+      console.error('Ошибка при изменении аватара:', err);
+    });
+});
+
 editForm.addEventListener('submit', (e) => {
   e.preventDefault();
 
-  profileTitle.textContent = editFormName.value;
-  profileDescription.textContent = editFormDescription.value;
+  const userData = {
+    name: editFormInputName.value,
+    about: editFormInputDescription.value
+  };
+
+  updateProfile(userData)
+    .then(() => {
+      profileTitle.textContent = userData.name;
+      profileDescription.textContent = userData.about;
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 
   closeEditModal();
 });
@@ -73,57 +105,53 @@ editForm.addEventListener('submit', (e) => {
 addCardForm.addEventListener('submit', (e) => {
   e.preventDefault();
 
-  const name = addCardFormName.value;
-  const link = addCardFormLink.value;
+  const cardData = {
+    name: addCardFormInputName.value,
+    link: addCardFormInputLink.value
+  };
 
-  cardContainer.prepend(
-    createCard(name, link, deleteCard, likeCard, (item) => {
-      setSelectImage(item);
-      openSelectImagePopup();
+  addCard(cardData)
+    .then((res) => {
+      renderCard(
+        res,
+        cardContainer,
+        selectImagePopup,
+        openSelectImagePopup,
+        res.owner._id,
+        true
+      );
+
+      addCardForm.reset();
+      closeAddModal();
     })
-  );
-
-  addCardForm.reset();
-
-  closeAddModal();
+    .catch((err) => {
+      console.error(err);
+    });
 });
 
-// Validation
-const setSubmitState = (isFormValid, modal) => {
-  const saveButton = modal.querySelector('.popup__button');
+const renderProfile = (profileData) => {
+  const defaultName = 'Жак-Ив Кусто';
+  const defaultAbout = 'Исследователь океана';
+  const defaultAvatar = '../../../images/avatar.jpg';
 
-  if (isFormValid) {
-    saveButton.removeAttribute('disabled');
-    saveButton.classList.remove('popup__button_disabled');
-  } else {
-    saveButton.setAttribute('disabled', true);
-    saveButton.classList.add('popup__button_disabled');
-  }
+  profileTitle.textContent = profileData.name || defaultName;
+  profileDescription.textContent = profileData.about || defaultAbout;
+  profileImage.style.backgroundImage = `url(${profileData.avatar || defaultAvatar})`;
 };
 
-console.log(profileTitle.textContent);
+const init = async () => {
+  const profileData = await getProfileData();
+  const initCards = await getCards();
 
-editForm.addEventListener('input', () => {
-  const isValid =
-    editFormName.value.length > 0 && editFormDescription.value.length > 0;
+  renderProfile(profileData);
 
-  setSubmitState(isValid, editForm);
-});
-
-addCardForm.addEventListener('input', () => {
-  const isValid =
-    addCardFormName.value.length > 0 && addCardFormLink.value.length > 0;
-
-  setSubmitState(isValid, addCardForm);
-});
-
-// render Cards
-
-initialCards.forEach((item) => {
-  cardContainer.append(
-    createCard(item.name, item.link, deleteCard, likeCard, (item) => {
-      setSelectImage(item);
-      openSelectImagePopup();
-    })
+  renderCards(
+    initCards,
+    cardContainer,
+    selectImagePopup,
+    openSelectImagePopup,
+    profileData._id
   );
-});
+};
+
+init();

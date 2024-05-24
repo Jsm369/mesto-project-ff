@@ -21,10 +21,13 @@
   cursor: pointer;
 }
 
-.popup__button_disabled {
+.inactive {
   cursor: default;
-  background-color: #686767;
+  background-color: transparent;
+  border: 1px solid #000000;
+  color: rgba(0, 0, 0, 0.8);
   pointer-events: none;
+  opacity: 0.8;
 }
 
 @media screen and (max-width: 568px) {
