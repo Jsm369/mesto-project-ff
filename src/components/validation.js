@@ -48,31 +48,31 @@ const checkInputValid = (formElement, inputElement, config) => {
 };
 
 export const clearValidation = (formElement, config) => {
-  const inputElements = Array.from(
-    formElement.querySelectorAll(config.inputSelector)
-  );
-
-  inputElements.forEach((inputElement) => {
-    inputElement.setCustomValidity('');
-    hideInputError(formElement, inputElement, config);
-  });
-};
-
-const setEventListener = (formElement, config) => {
   const inputList = Array.from(
     formElement.querySelectorAll(config.inputSelector)
   );
+
+  inputList.forEach((inputElement) => {
+    inputElement.setCustomValidity('');
+    hideInputError(formElement, inputElement, config);
+  });
+
   const buttonElement = formElement.querySelector(config.submitButtonSelector);
 
   toggleButtonState(inputList, buttonElement, config);
+};
+
+const setEventListener = (formElement, config) => {
+  const buttonElement = formElement.querySelector(config.submitButtonSelector);
+
+  const inputList = Array.from(
+    formElement.querySelectorAll(config.inputSelector)
+  );
 
   inputList.forEach((inputElement) => {
     inputElement.addEventListener('input', () => {
       const inputValue = inputElement.value;
 
-      console.log(inputElement.getAttribute('pattern'));
-
-      // const pattern = /^[a-zA-Zа-яА-ЯёЁ\s\-]+$/;
       const pattern = inputElement.getAttribute('pattern');
 
       if (pattern) {
@@ -87,16 +87,14 @@ const setEventListener = (formElement, config) => {
           inputElement.setCustomValidity('');
         }
       }
-
-      checkInputValid(formElement, inputElement, config);
       toggleButtonState(inputList, buttonElement, config);
+      checkInputValid(formElement, inputElement, config);
     });
   });
 };
 
 export const enableValidation = (config) => {
   const formList = document.querySelectorAll(config.formSelector);
-  console.log('dsadsa');
 
   formList.forEach((formElement) => {
     setEventListener(formElement, config);
