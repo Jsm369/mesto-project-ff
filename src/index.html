@@ -44,9 +44,10 @@
               type="text"
               id="name-input"
               name="name"
-              class="popup__input popup__input_type_name validation-with-pattern"
+              class="popup__input popup__input_type_name"
               placeholder="Имя"
               required
+              pattern="^[a-zA-Zа-яА-ЯёЁ\s\-]+$"
               minlength="2"
               maxlength="40"
             />
@@ -58,6 +59,7 @@
               class="popup__input popup__input_type_description"
               placeholder="Занятие"
               required
+              pattern="^[a-zA-Zа-яА-ЯёЁ\s\-]+$"
               minlength="2"
               maxlength="200"
             />
@@ -78,9 +80,10 @@
               id="card_name-input"
               type="text"
               name="place_name"
-              class="popup__input validation-with-pattern"
+              class="popup__input"
               placeholder="Название"
               required
+              pattern="^[a-zA-Zа-яА-ЯёЁ\s\-]+$"
               minlength="2"
               maxlength="30"
             />
@@ -94,7 +97,10 @@
               required
             />
             <span class="form__input-error url-input-error"></span>
-            <button type="submit" class="button popup__button inactive">
+            <button
+              type="submit"
+              class="button popup__button popup__button_disabled"
+            >
               Сохранить
             </button>
           </form>
@@ -119,7 +125,10 @@
               required
             />
             <span class="form__input-error url-input-error"></span>
-            <button type="submit" class="button popup__button inactive">
+            <button
+              type="submit"
+              class="button popup__button popup__button_disabled"
+            >
               Сохранить
             </button>
           </form>

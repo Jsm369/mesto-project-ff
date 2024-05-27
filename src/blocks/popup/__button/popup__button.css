@@ -21,7 +21,7 @@
   cursor: pointer;
 }
 
-.inactive {
+.popup__button_disabled {
   cursor: default;
   background-color: transparent;
   border: 1px solid #000000;

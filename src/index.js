@@ -1,5 +1,6 @@
 import './pages/index.css';
-import { renderCards, renderCard } from './components/cards';
+import { renderCards, renderCard } from './components/card';
+import { clearValidation, enableValidation } from './components/validation';
 import {
   updateProfile,
   addCard,
@@ -8,6 +9,15 @@ import {
   getCards
 } from './api/api';
 import { initModal } from './components/modal';
+
+const config = {
+  formSelector: '.popup__form',
+  inputSelector: '.popup__input',
+  submitButtonSelector: '.popup__button',
+  inactiveButtonClass: 'popup__button_disabled',
+  inputErrorClass: 'popup__input_type_error',
+  errorClass: 'popup__error_visible'
+};
 
 const container = document.querySelector('.page');
 const cardContainer = container.querySelector('.places__list');
@@ -41,6 +51,7 @@ const { closeModal: closeEditModal } = initModal({
   onOpen: () => {
     editFormInputName.value = profileTitle.textContent;
     editFormInputDescription.value = profileDescription.textContent;
+    clearValidation(editForm, config);
   }
 });
 
@@ -48,7 +59,9 @@ const { closeModal: closeAddModal } = initModal({
   modal: newCardPopup,
   openTarget: addButton,
   onOpen: () => {
-    (addCardFormInputName.value = ''), (addCardFormInputLink.value = '');
+    addCardFormInputName.value = '';
+    addCardFormInputLink.value = '';
+    clearValidation(addCardForm, config);
   }
 });
 
@@ -61,6 +74,7 @@ const { closeModal: closeChangeModal } = initModal({
   openTarget: changeAvatarButton,
   onOpen: () => {
     inputAvatarFormImage.value = '';
+    clearValidation(avatarForm, config);
   }
 });
 
@@ -98,12 +112,13 @@ editForm.addEventListener('submit', (e) => {
     name: editFormInputName.value,
     about: editFormInputDescription.value
   };
+
   saveButton.textContent = 'Сохранение...';
 
   updateProfile(userData)
-    .then(() => {
-      profileTitle.textContent = userData.name;
-      profileDescription.textContent = userData.about;
+    .then((res) => {
+      profileTitle.textContent = res.name;
+      profileDescription.textContent = res.about;
     })
     .catch((err) => {
       console.log(err);
@@ -160,18 +175,20 @@ const renderProfile = (profileData) => {
 };
 
 const init = async () => {
-  const profileData = await getProfileData();
-  const initCards = await getCards();
+  const promise = Promise.all([getProfileData(), getCards()]);
 
-  renderProfile(profileData);
+  const data = await promise;
+
+  renderProfile(data[0]);
 
   renderCards(
-    initCards,
+    data[1],
     cardContainer,
     selectImagePopup,
     openSelectImagePopup,
-    profileData._id
+    data[0]._id
   );
 };
 
+enableValidation(config);
 init();

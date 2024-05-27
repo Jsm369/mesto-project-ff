@@ -1,21 +1,30 @@
 import { deleteCard, unlikeCard, likeCard } from '../api/api';
 
-export const createCard = (cardData, onDelete, onImageClick, currentUser) => {
+export const createCard = (
+  cardData,
+  onDelete,
+  onLike,
+  onDeleteLike,
+  onImageClick,
+  currentUserId
+) => {
   const cardTemplate = document.querySelector('#card-template').content;
   const cardElement = cardTemplate.querySelector('.card').cloneNode(true);
-  const cardLike = cardElement.querySelector('.card__like-container');
   const deleteButton = cardElement.querySelector('.card__delete-button');
-  const likeCount = cardLike.querySelector('.card__like-count');
-  const likeButton = cardLike.querySelector('.card__like-button');
   const cardTitle = cardElement.querySelector('.card__title');
   const selectedImage = cardElement.querySelector('.card__image');
+  const cardLike = cardElement.querySelector('.card__like-container');
+
+  const likeButton = cardLike.querySelector('.card__like-button');
+  const likeCount = cardLike.querySelector('.card__like-count');
 
   cardTitle.textContent = cardData.name;
   selectedImage.src = cardData.link;
   selectedImage.setAttribute('alt', cardData.name);
+
   likeCount.textContent = cardData.likes.length;
 
-  if (currentUser !== cardData.owner._id) {
+  if (currentUserId !== cardData.owner._id) {
     deleteButton.style.display = 'none';
   } else {
     deleteButton.addEventListener('click', () =>
@@ -23,40 +32,49 @@ export const createCard = (cardData, onDelete, onImageClick, currentUser) => {
     );
   }
 
-  const likesIds = cardData.likes.map((item) => item._id);
-  let isLiked = likesIds.includes(currentUser);
+  let isLiked = cardData.likes.some((item) => item._id === currentUserId);
 
   if (isLiked) {
     likeButton.classList.add('card__like-button_is-active');
   }
 
-  const handleClickOnLike = () => {
+  likeButton.addEventListener('click', () => {
     if (isLiked) {
-      unlikeCard(cardData._id)
-        .then(() => {
-          likeCount.textContent = parseInt(likeCount.textContent) - 1;
-          likeButton.classList.remove('card__like-button_is-active');
-          isLiked = false;
-        })
-        .catch((error) => console.error('Error deleting like:', error));
+      onDeleteLike(likeCount, cardData);
+      likeButton.classList.remove('card__like-button_is-active');
+      isLiked = false;
     } else {
-      likeCard(cardData._id)
-        .then(() => {
-          likeCount.textContent = parseInt(likeCount.textContent) + 1;
-          likeButton.classList.add('card__like-button_is-active');
-          isLiked = true;
-        })
-        .catch((error) => console.error('Error setting like:', error));
+      onLike(likeCount, cardData);
+      likeButton.classList.add('card__like-button_is-active');
+      isLiked = true;
     }
-  };
-
-  likeButton.addEventListener('click', handleClickOnLike);
+  });
 
   selectedImage.addEventListener('click', () =>
     onImageClick(cardData.name, cardData.link)
   );
 
   return cardElement;
+};
+
+const like = (likeCount, cardData) => {
+  likeCard(cardData._id)
+    .then((res) => {
+      likeCount.textContent = res.likes.length;
+    })
+    .catch((err) => {
+      console.log(err, 'Ошибка при лайке');
+    });
+};
+
+const unLike = (likeCount, cardData) => {
+  unlikeCard(cardData._id)
+    .then((res) => {
+      likeCount.textContent = res.likes.length;
+    })
+    .catch((err) => {
+      console.log(err, 'Ошибка при удалении лайка');
+    });
 };
 
 const onDeleteCard = (card, cardId) => {
@@ -83,18 +101,20 @@ export const renderCard = (
   cardContainer,
   imagePopup,
   callback,
-  currentUser,
+  currentUserId,
   insertBefore = false
 ) => {
   cardContainer[insertBefore ? 'prepend' : 'append'](
     createCard(
       card,
       onDeleteCard,
+      like,
+      unLike,
       () => {
         setSelectImage(imagePopup, card);
         callback();
       },
-      currentUser
+      currentUserId
     )
   );
 };
@@ -104,9 +124,9 @@ export const renderCards = (
   cardContainer,
   imagePopup,
   callback,
-  currentUser
+  currentUserId
 ) => {
   cards.forEach((item) => {
-    renderCard(item, cardContainer, imagePopup, callback, currentUser);
+    renderCard(item, cardContainer, imagePopup, callback, currentUserId);
   });
 };
