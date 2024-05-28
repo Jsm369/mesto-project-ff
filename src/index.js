@@ -99,7 +99,7 @@ avatarForm.addEventListener('submit', (e) => {
       console.error('Ошибка при изменении аватара:', err);
     })
     .finally(() => {
-      saveButton.textContent = '';
+      saveButton.textContent = 'Сохранить';
     });
 });
 
@@ -124,7 +124,7 @@ editForm.addEventListener('submit', (e) => {
       console.log(err);
     })
     .finally(() => {
-      saveButton.textContent = '';
+      saveButton.textContent = 'Сохранить';
     });
 
   closeEditModal();
@@ -160,7 +160,7 @@ addCardForm.addEventListener('submit', (e) => {
       console.error(err);
     })
     .finally(() => {
-      saveButton.textContent = '';
+      saveButton.textContent = 'Сохранить';
     });
 });
 

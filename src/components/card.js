@@ -3,8 +3,7 @@ import { deleteCard, unlikeCard, likeCard } from '../api/api';
 export const createCard = (
   cardData,
   onDelete,
-  onLike,
-  onDeleteLike,
+  likeAction,
   onImageClick,
   currentUserId
 ) => {
@@ -39,15 +38,9 @@ export const createCard = (
   }
 
   likeButton.addEventListener('click', () => {
-    if (isLiked) {
-      onDeleteLike(likeCount, cardData);
-      likeButton.classList.remove('card__like-button_is-active');
-      isLiked = false;
-    } else {
-      onLike(likeCount, cardData);
-      likeButton.classList.add('card__like-button_is-active');
-      isLiked = true;
-    }
+    likeAction(likeCount, cardData, isLiked);
+    likeButton.classList.toggle('card__like-button_is-active');
+    isLiked = !isLiked;
   });
 
   selectedImage.addEventListener('click', () =>
@@ -57,24 +50,24 @@ export const createCard = (
   return cardElement;
 };
 
-const like = (likeCount, cardData) => {
-  likeCard(cardData._id)
-    .then((res) => {
-      likeCount.textContent = res.likes.length;
-    })
-    .catch((err) => {
-      console.log(err, 'Ошибка при лайке');
-    });
-};
-
-const unLike = (likeCount, cardData) => {
-  unlikeCard(cardData._id)
-    .then((res) => {
-      likeCount.textContent = res.likes.length;
-    })
-    .catch((err) => {
-      console.log(err, 'Ошибка при удалении лайка');
-    });
+const handleClickOnLike = (likeCount, cardData, isLiked) => {
+  if (isLiked) {
+    unlikeCard(cardData._id)
+      .then((res) => {
+        likeCount.textContent = res.likes.length;
+      })
+      .catch((err) => {
+        console.error(err, 'Ошибка при удалении лайка');
+      });
+  } else {
+    likeCard(cardData._id)
+      .then((res) => {
+        likeCount.textContent = res.likes.length;
+      })
+      .catch((err) => {
+        console.error(err, 'Ошибка при лайка');
+      });
+  }
 };
 
 const onDeleteCard = (card, cardId) => {
@@ -108,8 +101,7 @@ export const renderCard = (
     createCard(
       card,
       onDeleteCard,
-      like,
-      unLike,
+      handleClickOnLike,
       () => {
         setSelectImage(imagePopup, card);
         callback();
